@@ -733,12 +733,19 @@ function dlCSV() {
 }
 
 function computePnL(brand) {
-  const orders = dashData.orders.filter(o => o.financial_status !== 'refunded');
+  const { s, e } = getPD();
+  const startStr = fd(s), endStr = fd(e);
+  const orders = dashData.orders.filter(o => {
+    if (o.financial_status === 'refunded') return false;
+    const d = o.created_at.split('T')[0];
+    return d >= startStr && d <= endStr;
+  });
   const rev = orders.reduce((s, o) => s + parseFloat(o.total_price), 0);
   const cogs = orders.reduce((s, o) => s + getCogs(brand, parseFloat(o.total_price)), 0);
   const cc = orders.reduce((s, o) => s + getCC(brand, parseFloat(o.total_price)), 0);
   const gp = rev - cogs - cc, gm = rev > 0 ? (gp / rev) * 100 : 0;
-  const ad = dashData.insights.reduce((s, d) => s + parseFloat(d.spend || 0), 0);
+  const insights = dashData.insights.filter(i => i.date_start >= startStr && i.date_start <= endStr);
+  const ad = insights.reduce((s, d) => s + parseFloat(d.spend || 0), 0);
   const tax = ad * getTaxR(brand), tad = ad + tax;
   const np = gp - tad, nm = rev > 0 ? (np / rev) * 100 : 0;
   const roas = tad > 0 ? rev / tad : 0, aov = orders.length > 0 ? rev / orders.length : 0;
@@ -866,7 +873,12 @@ function renderFees(brand, pnl) {
 }
 
 function renderOrders(brand) {
-  const orders = [...dashData.orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 100);
+  const { s, e } = getPD();
+  const startStr = fd(s), endStr = fd(e);
+  const orders = [...dashData.orders]
+    .filter(o => { const d = o.created_at.split('T')[0]; return d >= startStr && d <= endStr; })
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 100);
   let tR = 0, tC = 0, tF = 0, tG = 0;
   document.getElementById('ordersBody').innerHTML = orders.map(o => {
     const p = parseFloat(o.total_price), cogs = getCogs(brand, p), cc = getCC(brand, p), gp = p - cogs - cc;
