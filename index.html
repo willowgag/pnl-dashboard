@@ -38,13 +38,9 @@ select option { background: var(--bg3); }
 a { color: var(--accent2); text-decoration: none; }
 a:hover { text-decoration: underline; }
 code { font-family: var(--mono); font-size: 12px; background: var(--bg4); padding: 2px 6px; border-radius: 4px; color: var(--accent2); }
-
-/* Layout */
 #app { display: flex; min-height: 100vh; }
 #sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; }
 #main { flex: 1; overflow-x: hidden; }
-
-/* Sidebar */
 .sb-header { padding: 20px 16px 16px; border-bottom: 1px solid var(--border); }
 .sb-logo { font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: .04em; font-family: var(--mono); }
 .sb-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
@@ -61,18 +57,12 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 .drive-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); }
 .drive-dot.ok { background: var(--green); }
 .drive-dot.syncing { background: var(--amber); animation: blink 1s infinite; }
-
-/* Top bar */
 #topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); }
 .tb-left { display: flex; align-items: center; gap: 12px; }
 .tb-brand { font-size: 15px; font-weight: 500; }
-.tb-period { display: flex; align-items: center; gap: 8px; }
-.tb-period select { width: auto; padding: 6px 10px; font-size: 12px; }
 .tb-right { display: flex; gap: 8px; }
-
-/* Buttons */
 .btn { padding: 8px 16px; border-radius: var(--r); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); transition: all .15s; font-family: var(--font); display: inline-flex; align-items: center; gap: 6px; }
-.btn:hover { background: var(--bg4); border-color: var(--border2); }
+.btn:hover { background: var(--bg4); }
 .btn:disabled { opacity: .4; cursor: default; }
 .btn-accent { background: var(--accent); color: #0a0a0a; border-color: var(--accent); font-weight: 500; }
 .btn-accent:hover { background: #b5da2a; border-color: #b5da2a; }
@@ -80,12 +70,8 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 .btn-danger:hover { background: rgba(255,77,77,.1); }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text2); }
 .btn-ghost:hover { background: var(--bg3); color: var(--text); border-color: var(--border); }
-
-/* Screens */
 .screen { display: none; }
 .screen.active { display: block; }
-
-/* Auth screen */
 #authScreen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg); }
 .auth-box { max-width: 420px; width: 100%; padding: 40px; text-align: center; }
 .auth-logo { font-family: var(--mono); font-size: 20px; color: var(--accent); margin-bottom: 8px; }
@@ -95,8 +81,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 .auth-feature { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 13px; color: var(--text2); }
 .auth-feature:last-child { margin-bottom: 0; }
 .af-icon { color: var(--accent); font-size: 15px; margin-top: 1px; flex-shrink: 0; }
-
-/* Setup screen */
 #setupScreen { padding: 32px 24px; max-width: 680px; }
 .setup-header { margin-bottom: 24px; }
 .setup-title { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
@@ -115,33 +99,23 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 .tier-input-wrap span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text3); pointer-events: none; }
 .tier-input-wrap input { padding-left: 22px; }
 .setup-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-
-/* Dashboard */
 #dashScreen { display: flex; flex-direction: column; min-height: calc(100vh - 53px); }
 .dash-content { padding: 24px; flex: 1; }
-
-/* Metrics */
 .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
 .metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; }
 .metric-card.highlight { border-color: var(--accent); }
 .mc-label { font-size: 11px; color: var(--text3); margin-bottom: 8px; letter-spacing: .02em; }
 .mc-value { font-size: 20px; font-weight: 500; font-family: var(--mono); margin-bottom: 4px; }
 .mc-sub { font-size: 11px; color: var(--text3); }
-
-/* Sync bar */
 .sync-bar { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .sync-bar-left { display: flex; flex-direction: column; gap: 3px; }
 .sync-bar-title { font-size: 13px; font-weight: 500; }
 .sync-bar-sub { font-size: 12px; color: var(--text3); }
-
-/* Tabs */
 .tab-bar { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 3px; margin-bottom: 20px; width: fit-content; }
 .tab-btn { padding: 6px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--text2); border: none; background: transparent; font-family: var(--font); transition: all .15s; }
 .tab-btn.active { background: var(--bg4); color: var(--text); }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
-
-/* Cards */
 .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; margin-bottom: 16px; }
 .card-title { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--text3); margin-bottom: 16px; }
 .chart-wrap { position: relative; width: 100%; }
@@ -149,8 +123,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
 .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
 .legend-sq { width: 10px; height: 10px; border-radius: 2px; }
-
-/* Waterfall */
 .wf-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border-radius: var(--r); margin-bottom: 3px; font-size: 13px; }
 .wf-row.wf-sub, .wf-row.wf-total { background: var(--bg3); font-weight: 500; }
 .wf-row.wf-total { font-size: 14px; }
@@ -159,8 +131,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 .wf-amount.neg { color: var(--red); font-family: var(--mono); }
 .wf-amount.pos { color: var(--green); font-family: var(--mono); }
 .wf-amount.neu { font-family: var(--mono); }
-
-/* Table */
 .table-wrap { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
 .data-table th { text-align: left; padding: 8px 12px; font-size: 11px; color: var(--text3); border-bottom: 1px solid var(--border); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -172,26 +142,14 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 .badge-green { background: rgba(77,255,145,.12); color: var(--green); }
 .badge-red { background: rgba(255,77,77,.12); color: var(--red); }
 .badge-amber { background: rgba(255,184,77,.12); color: var(--amber); }
-
-/* AI box */
 .ai-output { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; margin-top: 16px; font-size: 14px; line-height: 1.75; color: var(--text2); }
 .ai-output.loading { animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
-
-/* Empty state */
-.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; }
-.empty-title { font-size: 18px; font-weight: 300; margin-bottom: 8px; color: var(--text2); }
-.empty-sub { font-size: 14px; color: var(--text3); margin-bottom: 24px; }
-
-/* Status */
 .status-msg { font-size: 12px; color: var(--text3); margin-top: 8px; min-height: 18px; }
 .status-msg.err { color: var(--red); }
-
-/* Delete brand */
 .danger-zone { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 .danger-title { font-size: 11px; color: var(--red); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
-
 #dateBar { display:flex; align-items:center; gap:12px; padding:10px 24px; border-bottom:1px solid var(--border); background:var(--bg2); flex-wrap:wrap; }
 #quickBtns { display:flex; gap:4px; flex-wrap:wrap; }
 .qbtn { padding:5px 12px; border-radius:6px; font-size:12px; cursor:pointer; color:var(--text3); border:1px solid transparent; background:transparent; font-family:var(--font); transition:all .15s; }
@@ -209,7 +167,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
 </head>
 <body>
 
-<!-- Auth Screen (shown when not connected to Drive) -->
 <div id="authScreen">
   <div class="auth-box">
     <div class="auth-logo">PNL//DASH</div>
@@ -221,17 +178,13 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
       <div class="auth-feature"><span class="af-icon">↗</span><span>Quebec taxes (GST + QST) and CC fees calculated automatically</span></div>
       <div class="auth-feature"><span class="af-icon">↗</span><span>Daily PnL CSV synced to your Drive, open in Sheets anytime</span></div>
     </div>
-    <button class="btn btn-accent" onclick="signIn()" id="signInBtn" style="width:100%;justify-content:center;padding:12px;">
-      Connect with Google Drive
-    </button>
+    <button class="btn btn-accent" onclick="signIn()" id="signInBtn" style="width:100%;justify-content:center;padding:12px;">Connect with Google Drive</button>
     <p style="font-size:11px;color:var(--text3);margin-top:12px;">Your tokens are stored in your own Google Drive. Never on any server.</p>
   </div>
 </div>
 
-<!-- Main App (shown after auth) -->
 <div id="appScreen" style="display:none;">
   <div id="app">
-    <!-- Sidebar -->
     <div id="sidebar">
       <div class="sb-header">
         <div class="sb-logo">PNL//DASH</div>
@@ -249,31 +202,26 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
       </div>
     </div>
 
-    <!-- Main content -->
     <div id="main">
-      <!-- Setup screen -->
       <div id="setupScreen" class="screen active">
         <div class="setup-header">
           <div class="setup-title" id="setupTitle">Add your first brand</div>
           <div class="setup-sub" id="setupSubtitle">Connect your Shopify store and Meta Ads account to get started.</div>
         </div>
-
         <div class="form-section">
           <div class="form-section-title">Brand</div>
           <div class="form-row single">
             <div class="form-group"><label>Brand name</label><input type="text" id="brandName" placeholder="My Store"></div>
           </div>
         </div>
-
         <div class="form-section">
           <div class="form-section-title">Shopify</div>
           <div class="form-row">
             <div class="form-group"><label>Store domain</label><input type="text" id="sDomain" placeholder="yourstore.myshopify.com"></div>
             <div class="form-group"><label>Admin API token (shpat_...)</label><input type="password" id="twToken" placeholder="shpat_..."></div>
           </div>
-          <p class="form-hint">Use the token generated from the OAuth flow.</p>
+          <p class="form-hint">Use the shpat_ token generated from the OAuth flow.</p>
         </div>
-
         <div class="form-section">
           <div class="form-section-title">Meta Ads</div>
           <div class="form-row">
@@ -282,7 +230,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
           </div>
           <p class="form-hint">Generate at <a href="https://developers.facebook.com/tools/explorer/" target="_blank">Meta Graph Explorer →</a> Scope: <code>ads_read</code></p>
         </div>
-
         <div class="form-section">
           <div class="form-section-title">COGS tiers — fixed $ per order value range</div>
           <div class="tier-grid-header">
@@ -291,7 +238,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
           <div id="tiersContainer"></div>
           <button class="btn btn-ghost" onclick="addTier()" style="margin-top:4px;font-size:12px;">+ Add tier</button>
         </div>
-
         <div class="form-section">
           <div class="form-section-title">Fees & taxes</div>
           <div class="form-row">
@@ -304,7 +250,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
           </div>
           <p class="form-hint">Quebec: GST 5% + QST 9.975% = 14.975% on Meta ad spend.</p>
         </div>
-
         <div class="setup-actions">
           <button class="btn btn-accent" onclick="saveBrand()" id="saveBrandBtn">Save & launch dashboard</button>
           <button class="btn" onclick="cancelSetup()" id="cancelSetupBtn" style="display:none;">Cancel</button>
@@ -316,7 +261,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
         <div id="setupStatus" class="status-msg"></div>
       </div>
 
-      <!-- Dashboard screen -->
       <div id="dashScreen" class="screen">
         <div id="topbar">
           <div class="tb-left">
@@ -346,7 +290,6 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
           </div>
           <span id="dateRange" style="font-size:12px;color:var(--text3);margin-left:auto;"></span>
         </div>
-
         <div class="dash-content">
           <div class="sync-bar">
             <div class="sync-bar-left">
@@ -355,9 +298,7 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
             </div>
             <button class="btn btn-accent" onclick="syncDrive()" id="syncBtn">↑ Update Dashboard</button>
           </div>
-
           <div class="metrics-grid" id="metricsGrid"></div>
-
           <div class="tab-bar">
             <button class="tab-btn active" onclick="switchTab(event,'ov')">Overview</button>
             <button class="tab-btn" onclick="switchTab(event,'fp')">Fees & profit</button>
@@ -365,25 +306,23 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
             <button class="tab-btn" onclick="switchTab(event,'ad')">Ad spend</button>
             <button class="tab-btn" onclick="switchTab(event,'ai')">AI analysis</button>
           </div>
-
           <div id="tab-ov" class="tab-content active">
             <div class="card">
               <div class="card-title">Revenue vs costs</div>
               <div class="legend" id="leg1"></div>
-              <div class="chart-wrap" style="height:260px;"><canvas id="c1" role="img" aria-label="Daily revenue COGS and net profit"></canvas></div>
+              <div class="chart-wrap" style="height:260px;"><canvas id="c1"></canvas></div>
             </div>
             <div class="two-col">
               <div class="card">
                 <div class="card-title">Cost breakdown</div>
-                <div class="chart-wrap" style="height:200px;"><canvas id="c2" role="img" aria-label="Cost breakdown donut chart"></canvas></div>
+                <div class="chart-wrap" style="height:200px;"><canvas id="c2"></canvas></div>
               </div>
               <div class="card">
                 <div class="card-title">ROAS over time</div>
-                <div class="chart-wrap" style="height:200px;"><canvas id="c3" role="img" aria-label="ROAS line chart"></canvas></div>
+                <div class="chart-wrap" style="height:200px;"><canvas id="c3"></canvas></div>
               </div>
             </div>
           </div>
-
           <div id="tab-fp" class="tab-content">
             <div class="card">
               <div class="card-title">PnL waterfall</div>
@@ -393,23 +332,18 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
             <div class="card">
               <div class="card-title">Daily cost stack</div>
               <div class="legend" id="leg2"></div>
-              <div class="chart-wrap" style="height:260px;"><canvas id="c4" role="img" aria-label="Stacked daily costs chart"></canvas></div>
+              <div class="chart-wrap" style="height:260px;"><canvas id="c4"></canvas></div>
             </div>
           </div>
-
           <div id="tab-or" class="tab-content">
             <div class="card" style="padding:0;">
               <div class="table-wrap">
                 <table class="data-table">
                   <thead><tr>
-                    <th style="width:90px;">Order</th>
-                    <th style="width:95px;">Date</th>
-                    <th style="width:90px;">Revenue</th>
-                    <th style="width:80px;">COGS</th>
-                    <th style="width:80px;">CC fee</th>
-                    <th style="width:90px;">Gross profit</th>
-                    <th style="width:75px;">Margin</th>
-                    <th style="width:90px;">Status</th>
+                    <th style="width:90px;">Order</th><th style="width:95px;">Date</th>
+                    <th style="width:90px;">Revenue</th><th style="width:80px;">COGS</th>
+                    <th style="width:80px;">CC fee</th><th style="width:90px;">Gross profit</th>
+                    <th style="width:75px;">Margin</th><th style="width:90px;">Status</th>
                   </tr></thead>
                   <tbody id="ordersBody"></tbody>
                   <tfoot id="ordersFoot"></tfoot>
@@ -418,32 +352,27 @@ code { font-family: var(--mono); font-size: 12px; background: var(--bg4); paddin
               <p style="font-size:11px;color:var(--text3);padding:10px 12px;" id="ordersNote"></p>
             </div>
           </div>
-
           <div id="tab-ad" class="tab-content">
             <div class="metrics-grid" id="adMetrics"></div>
             <div class="card">
               <div class="card-title">Ad spend vs revenue</div>
               <div class="legend" id="leg3"></div>
-              <div class="chart-wrap" style="height:240px;"><canvas id="c5" role="img" aria-label="Ad spend vs revenue"></canvas></div>
+              <div class="chart-wrap" style="height:240px;"><canvas id="c5"></canvas></div>
             </div>
             <div class="card">
               <div class="card-title">Campaign breakdown</div>
               <div class="table-wrap" style="margin-top:8px;">
                 <table class="data-table">
                   <thead><tr>
-                    <th style="width:220px;">Campaign</th>
-                    <th style="width:90px;">Spend</th>
-                    <th style="width:90px;">+QC taxes</th>
-                    <th style="width:100px;">Impressions</th>
-                    <th style="width:70px;">Clicks</th>
-                    <th style="width:65px;">CTR</th>
+                    <th style="width:220px;">Campaign</th><th style="width:90px;">Spend</th>
+                    <th style="width:90px;">+QC taxes</th><th style="width:100px;">Impressions</th>
+                    <th style="width:70px;">Clicks</th><th style="width:65px;">CTR</th>
                   </tr></thead>
                   <tbody id="campsBody"></tbody>
                 </table>
               </div>
             </div>
           </div>
-
           <div id="tab-ai" class="tab-content">
             <div class="card">
               <div class="card-title">AI PnL analysis</div>
@@ -482,7 +411,7 @@ let charts = {};
 let currentDays = 30;
 let dateFrom = null;
 let dateTo = null;
-let quickMode = '30';
+let quickMode = 'today';
 let editingBrandId = null;
 let currentTiers = [];
 
@@ -560,11 +489,8 @@ async function onSignedIn() {
   await ensureFolder();
   await loadConfig();
   renderBrandList();
-  if (config.brands.length === 0) {
-    showSetup(null);
-  } else {
-    loadBrand(config.brands[0].id);
-  }
+  if (config.brands.length === 0) showSetup(null);
+  else loadBrand(config.brands[0].id);
 }
 
 async function ensureFolder() {
@@ -572,15 +498,9 @@ async function ensureFolder() {
     q: `name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
     fields: 'files(id,name)'
   });
-  if (res.result.files.length > 0) {
-    folderId = res.result.files[0].id;
-  } else {
-    const r = await gapi.client.drive.files.create({
-      resource: { name: FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder' },
-      fields: 'id'
-    });
-    folderId = r.result.id;
-  }
+  if (res.result.files.length > 0) { folderId = res.result.files[0].id; return; }
+  const r = await gapi.client.drive.files.create({ resource: { name: FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder' }, fields: 'id' });
+  folderId = r.result.id;
 }
 
 async function loadConfig() {
@@ -612,12 +532,9 @@ async function saveConfig() {
     form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
     form.append('file', new Blob([body], { type: 'application/json' }));
     const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${accessToken}` },
-      body: form
+      method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}` }, body: form
     });
-    const d = await r.json();
-    configFileId = d.id;
+    configFileId = (await r.json()).id;
   }
 }
 
@@ -627,18 +544,15 @@ async function getOrCreateCSV(slug) {
     q: `name='${name}' and '${folderId}' in parents and trashed=false`,
     fields: 'files(id,name)'
   });
-  if (res.result.files.length > 0) return { id: res.result.files[0].id, isNew: false };
+  if (res.result.files.length > 0) return { id: res.result.files[0].id };
   const meta = { name, parents: [folderId] };
   const form = new FormData();
   form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
   form.append('file', new Blob([CSV_HEADERS + '\n'], { type: 'text/csv' }));
   const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${accessToken}` },
-    body: form
+    method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}` }, body: form
   });
-  const d = await r.json();
-  return { id: d.id, isNew: true };
+  return { id: (await r.json()).id };
 }
 
 async function updateCSV(fileId, csvContent) {
@@ -656,22 +570,16 @@ async function readCSV(fileId) {
   } catch(e) { return CSV_HEADERS + '\n'; }
 }
 
-function slugify(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/__+/g, '_');
-}
+function slugify(name) { return name.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/__+/g, '_'); }
 
 function renderBrandList() {
-  const list = document.getElementById('brandList');
-  list.innerHTML = config.brands.map(b => `
+  document.getElementById('brandList').innerHTML = config.brands.map(b => `
     <div class="brand-item ${b.id === activeBrandId ? 'active' : ''}" onclick="loadBrand('${b.id}')">
-      <div class="brand-dot"></div>
-      <span>${b.name}</span>
+      <div class="brand-dot"></div><span>${b.name}</span>
     </div>`).join('');
 }
 
-function newBrand() {
-  showSetup(null);
-}
+function newBrand() { showSetup(null); }
 
 function showSetup(brandId) {
   editingBrandId = brandId;
@@ -680,7 +588,7 @@ function showSetup(brandId) {
   document.getElementById('setupSubtitle').textContent = brand ? 'Update your credentials and settings.' : 'Connect your Shopify store and Meta Ads account.';
   document.getElementById('brandName').value = brand ? brand.name : '';
   document.getElementById('sDomain').value = brand ? brand.shopifyDomain : '';
-  document.getElementById('twToken').value = brand ? brand.twToken : '';
+  document.getElementById('twToken').value = brand ? (brand.shopifyToken || brand.twToken || '') : '';
   document.getElementById('mToken').value = brand ? brand.metaToken : '';
   document.getElementById('mAcct').value = brand ? brand.metaAccountId : '';
   document.getElementById('ccR').value = brand ? brand.ccRate : 2.6;
@@ -695,27 +603,19 @@ function showSetup(brandId) {
   showScreen('setupScreen');
 }
 
-function cancelSetup() {
-  if (activeBrandId) loadBrand(activeBrandId);
-}
-
-function editBrand() {
-  showSetup(activeBrandId);
-}
+function cancelSetup() { if (activeBrandId) loadBrand(activeBrandId); }
+function editBrand() { showSetup(activeBrandId); }
 
 async function saveBrand() {
   const name = document.getElementById('brandName').value.trim();
   const domain = document.getElementById('sDomain').value.trim();
-  const twToken = document.getElementById('twToken').value.trim();
-  if (!name || !domain || !twToken) { setSetupMsg('Brand name, store domain and TripleWhale API key are required.', true); return; }
+  const shopifyToken = document.getElementById('twToken').value.trim();
+  if (!name || !domain || !shopifyToken) { setSetupMsg('Brand name, store domain and Shopify token are required.', true); return; }
   const btn = document.getElementById('saveBrandBtn');
   btn.disabled = true; btn.textContent = 'Saving...';
   const brand = {
     id: editingBrandId || ('brand_' + Date.now()),
-    name,
-    slug: slugify(name),
-    shopifyDomain: domain,
-    shopifyToken: twToken,
+    name, slug: slugify(name), shopifyDomain: domain, shopifyToken,
     metaToken: document.getElementById('mToken').value.trim(),
     metaAccountId: document.getElementById('mAcct').value.trim(),
     tiers: currentTiers,
@@ -724,20 +624,14 @@ async function saveBrand() {
     gst: parseFloat(document.getElementById('gstR').value) || 5,
     qst: parseFloat(document.getElementById('qstR').value) || 9.975
   };
-  if (editingBrandId) {
-    const idx = config.brands.findIndex(b => b.id === editingBrandId);
-    config.brands[idx] = brand;
-  } else {
-    config.brands.push(brand);
-  }
+  if (editingBrandId) { const idx = config.brands.findIndex(b => b.id === editingBrandId); config.brands[idx] = brand; }
+  else config.brands.push(brand);
   try {
     await saveConfig();
     setDriveStatus('ok', 'Config saved');
     renderBrandList();
     await loadBrand(brand.id);
-  } catch(e) {
-    setSetupMsg('Error saving to Drive: ' + e.message, true);
-  }
+  } catch(e) { setSetupMsg('Error saving to Drive: ' + e.message, true); }
   btn.disabled = false; btn.textContent = 'Save & launch dashboard';
 }
 
@@ -757,8 +651,11 @@ async function loadBrand(brandId) {
   document.getElementById('topBrandName').textContent = brand.name;
   document.getElementById('syncBrandSlug').textContent = brand.slug;
   const today = fd(new Date());
+  dateFrom = today; dateTo = today; quickMode = 'today';
   document.getElementById('dateFrom').value = today;
   document.getElementById('dateTo').value = today;
+  document.querySelectorAll('.qbtn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.qbtn').classList.add('active');
   renderBrandList();
   showScreen('dashScreen');
   await fetchBrandData(brand);
@@ -768,7 +665,6 @@ async function fetchBrandData(brand) {
   setDriveStatus('syncing', 'Fetching data...');
   const { s, e } = getPD();
 
-  // Fetch orders from Shopify via proxy
   if (brand.shopifyToken && brand.shopifyDomain) {
     try {
       const shopifyUrl = `https://${brand.shopifyDomain}/admin/api/2024-01/orders.json?status=any&limit=250&created_at_min=${s.toISOString()}&created_at_max=${e.toISOString()}&fields=id,order_number,created_at,total_price,financial_status`;
@@ -776,16 +672,10 @@ async function fetchBrandData(brand) {
       const r = await fetch(proxyUrl);
       if (!r.ok) throw new Error('Shopify error ' + r.status);
       dashData.orders = (await r.json()).orders || [];
-    } catch(e2) {
-      console.warn('Shopify fetch failed:', e2.message);
-      dashData.orders = [];
-    }
-  } else {
-    dashData.orders = [];
-  }
+    } catch(e2) { console.warn('Shopify fetch failed:', e2.message); dashData.orders = []; }
+  } else { dashData.orders = []; }
 
-  dashData.insights = [];
-  dashData.camps = [];
+  dashData.insights = []; dashData.camps = [];
   if (brand.metaToken && brand.metaAccountId) {
     try {
       const { s: ms, e: me } = getPD();
@@ -802,44 +692,6 @@ async function fetchBrandData(brand) {
   updateLastSync();
 }
 
-function buildOrdersFromTW(metrics, startDate, endDate) {
-  // TripleWhale returns aggregated data — we build a synthetic daily order list
-  // so the rest of the dashboard can render charts and tables
-  const orders = [];
-  const days = metrics?.dailyData || metrics?.daily || [];
-  if (days.length > 0) {
-    days.forEach(day => {
-      const revenue = day.totalSales || day.revenue || day.net_revenue || 0;
-      const count = day.orders || day.totalOrders || 1;
-      const aov = count > 0 ? revenue / count : 0;
-      for (let i = 0; i < count; i++) {
-        orders.push({
-          id: Math.random(),
-          order_number: Math.floor(Math.random() * 9000) + 1000,
-          created_at: (day.date || day.startDate || fd(startDate)) + 'T12:00:00Z',
-          total_price: aov.toFixed(2),
-          financial_status: 'paid'
-        });
-      }
-    });
-  } else {
-    // Fallback: use top-level totals as one synthetic block
-    const revenue = metrics?.totalSales || metrics?.revenue || metrics?.net_revenue || 0;
-    const count = metrics?.orders || metrics?.totalOrders || 0;
-    const aov = count > 0 ? revenue / count : 0;
-    for (let i = 0; i < count; i++) {
-      orders.push({
-        id: Math.random(),
-        order_number: Math.floor(Math.random() * 9000) + 1000,
-        created_at: fd(startDate) + 'T12:00:00Z',
-        total_price: aov.toFixed(2),
-        financial_status: 'paid'
-      });
-    }
-  }
-  return orders;
-}
-
 async function appendHistory(brand, pnl) {
   try {
     const { id: fileId } = await getOrCreateCSV(brand.slug);
@@ -848,8 +700,7 @@ async function appendHistory(brand, pnl) {
     const rows = existing.split('\n').filter(r => r && !r.startsWith('Date'));
     const filtered = rows.filter(r => !r.startsWith(today));
     const newRow = [today, +pnl.rev.toFixed(2), pnl.ord, +pnl.cogs.toFixed(2), +pnl.cc.toFixed(2), +pnl.gp.toFixed(2), +pnl.gm.toFixed(2), +pnl.ad.toFixed(2), +pnl.tax.toFixed(2), +pnl.tad.toFixed(2), +pnl.roas.toFixed(2), +pnl.np.toFixed(2), +pnl.nm.toFixed(2), +pnl.aov.toFixed(2), +pnl.cpa.toFixed(2)].join(',');
-    const csv = [CSV_HEADERS, ...filtered, newRow].join('\n');
-    await updateCSV(fileId, csv);
+    await updateCSV(fileId, [CSV_HEADERS, ...filtered, newRow].join('\n'));
     brand._csvFileId = fileId;
   } catch(e) { console.warn('History append failed:', e.message); }
 }
@@ -860,13 +711,8 @@ async function syncDrive() {
   const btn = document.getElementById('syncBtn');
   btn.disabled = true; btn.textContent = '↑ Syncing...';
   setDriveStatus('syncing', 'Syncing...');
-  try {
-    await appendHistory(brand, computePnL(brand));
-    setDriveStatus('ok', 'Synced');
-    updateLastSync();
-  } catch(e) {
-    setDriveStatus('syncing', 'Sync failed');
-  }
+  try { await appendHistory(brand, computePnL(brand)); setDriveStatus('ok', 'Synced'); updateLastSync(); }
+  catch(e) { setDriveStatus('syncing', 'Sync failed'); }
   btn.disabled = false; btn.textContent = '↑ Update Dashboard';
 }
 
@@ -879,8 +725,6 @@ async function refreshDash() {
   document.getElementById('refreshBtn').textContent = 'Refresh';
   document.getElementById('refreshBtn').disabled = false;
 }
-
-
 
 function dlCSV() {
   const brand = config.brands.find(b => b.id === activeBrandId);
@@ -914,12 +758,14 @@ function getTaxR(brand) { return (brand.gst + brand.qst) / 100; }
 function fc(v) { const s = v < 0 ? '-' : ''; return s + '$' + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function fp(v) { return v.toFixed(1) + '%'; }
 function fd(d) { return d.toISOString().split('T')[0]; }
+
 function getPD() {
   if (dateFrom && dateTo) return { s: new Date(dateFrom + 'T00:00:00'), e: new Date(dateTo + 'T23:59:59') };
   const e = new Date(), s = new Date();
   s.setDate(s.getDate() - currentDays);
   return { s, e };
 }
+
 function setQuick(mode, el) {
   quickMode = mode;
   document.querySelectorAll('.qbtn').forEach(b => b.classList.remove('active'));
@@ -936,6 +782,7 @@ function setQuick(mode, el) {
   const brand = config.brands.find(b => b.id === activeBrandId);
   if (brand) fetchBrandData(brand);
 }
+
 function applyCustom() {
   dateFrom = document.getElementById('dateFrom').value;
   dateTo = document.getElementById('dateTo').value;
@@ -968,9 +815,9 @@ function renderMetrics(pnl) {
 }
 
 function getDailyData(brand) {
-  const map = {}, { s } = getPD();
+  const map = {}, { s, e } = getPD();
   const c = new Date(s);
-  while (c <= new Date()) { map[fd(c)] = { rev: 0, cogs: 0, cc: 0, ad: 0, tax: 0, tad: 0 }; c.setDate(c.getDate() + 1); }
+  while (c <= e) { map[fd(c)] = { rev: 0, cogs: 0, cc: 0, ad: 0, tax: 0, tad: 0 }; c.setDate(c.getDate() + 1); }
   dashData.orders.filter(o => o.financial_status !== 'refunded').forEach(o => {
     const d = o.created_at.split('T')[0];
     if (map[d]) { const p = parseFloat(o.total_price); map[d].rev += p; map[d].cogs += getCogs(brand, p); map[d].cc += getCC(brand, p); }
@@ -1064,7 +911,8 @@ async function runAI() {
   const out = document.getElementById('aiOutput'), btn = document.getElementById('aiBtn');
   out.style.display = 'block'; out.className = 'ai-output loading'; out.textContent = 'Analyzing...'; btn.disabled = true;
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: `You are an ecommerce PnL analyst. Analyze this Quebec-based store. Plain text only, no markdown, no bullets. Separate sections with blank lines.\n\nBrand: ${brand.name}\nPeriod: Last ${currentDays} days\nOrders: ${pnl.ord}\nRevenue: $${pnl.rev.toFixed(2)}\nCOGS: $${pnl.cogs.toFixed(2)}\nCC fees: $${pnl.cc.toFixed(2)}\nGross profit: $${pnl.gp.toFixed(2)} (${pnl.gm.toFixed(1)}%)\nMeta ad spend: $${pnl.ad.toFixed(2)}\nQC taxes on ads: $${pnl.tax.toFixed(2)}\nNet profit: $${pnl.np.toFixed(2)} (${pnl.nm.toFixed(1)}%)\nROAS: ${pnl.roas.toFixed(2)}x\nAOV: $${pnl.aov.toFixed(2)}\n\nGive a concise PnL summary, key risks, and 3 actionable recommendations.` }] }) });
+    const { s, e } = getPD();
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: `You are an ecommerce PnL analyst. Analyze this Quebec-based store. Plain text only, no markdown, no bullets. Separate sections with blank lines.\n\nBrand: ${brand.name}\nPeriod: ${fd(s)} to ${fd(e)}\nOrders: ${pnl.ord}\nRevenue: $${pnl.rev.toFixed(2)}\nCOGS: $${pnl.cogs.toFixed(2)}\nCC fees: $${pnl.cc.toFixed(2)}\nGross profit: $${pnl.gp.toFixed(2)} (${pnl.gm.toFixed(1)}%)\nMeta ad spend: $${pnl.ad.toFixed(2)}\nQC taxes on ads: $${pnl.tax.toFixed(2)}\nNet profit: $${pnl.np.toFixed(2)} (${pnl.nm.toFixed(1)}%)\nROAS: ${pnl.roas.toFixed(2)}x\nAOV: $${pnl.aov.toFixed(2)}\nCPA: $${pnl.cpa.toFixed(2)}\n\nGive a concise PnL summary, key risks, and 3 actionable recommendations.` }] }) });
     const d = await r.json();
     out.className = 'ai-output';
     out.innerHTML = (d.content?.[0]?.text || 'No response.').split('\n\n').map(p => `<p style="margin-bottom:.75rem;">${p}</p>`).join('');
@@ -1114,12 +962,8 @@ window.addEventListener('load', async () => {
     const last = localStorage.getItem('pnl_last_sync');
     if (last) document.getElementById('lastSyncText').textContent = 'Last sync: ' + last;
     const restored = await tryRestoreSession();
-    if (!restored) {
-      document.getElementById('authScreen').style.display = 'flex';
-    }
-  } catch(e) {
-    document.getElementById('authScreen').style.display = 'flex';
-  }
+    if (!restored) document.getElementById('authScreen').style.display = 'flex';
+  } catch(e) { document.getElementById('authScreen').style.display = 'flex'; }
 });
 </script>
 </body>
