@@ -771,7 +771,7 @@ async function fetchBrandData(brand) {
   // Fetch orders from Shopify via proxy
   if (brand.shopifyToken && brand.shopifyDomain) {
     try {
-      const shopifyUrl = `https://${brand.shopifyDomain}/admin/api/2024-01/orders.json?status=any&limit=250&created_at_min=${s.toISOString()}&fields=id,order_number,created_at,total_price,financial_status`;
+      const shopifyUrl = `https://${brand.shopifyDomain}/admin/api/2024-01/orders.json?status=any&limit=250&created_at_min=${s.toISOString()}&created_at_max=${e.toISOString()}&fields=id,order_number,created_at,total_price,financial_status`;
       const proxyUrl = `https://pnl-proxy.willow-gag25.workers.dev/?token=${encodeURIComponent(brand.shopifyToken)}&url=${encodeURIComponent(shopifyUrl)}`;
       const r = await fetch(proxyUrl);
       if (!r.ok) throw new Error('Shopify error ' + r.status);
