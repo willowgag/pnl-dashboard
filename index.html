@@ -458,28 +458,41 @@ const DEFAULT_BRANDS = [
   }
 ];
 
-function loadBrands() {
-  try {
-    const saved = localStorage.getItem('pnl_brands');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch (e) {
-    console.error('Could not load saved brands', e);
-  }
-  return DEFAULT_BRANDS;
+// Apps Script web app URL — handles brand list GET/POST so it syncs across all devices
+const BRANDS_API_URL = 'https://script.google.com/macros/s/AKfycbxPqJ9tNVCRa97a6o-p30k28ZyPuQ-UcPVCBxnolC3DD4IXFtogstHYip5hAgrwDcfU-g/exec';
+
+function brandNameToId(name) {
+  return 'brand_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_');
 }
 
-function saveBrands(brands) {
+async function fetchBrandsFromServer() {
   try {
-    localStorage.setItem('pnl_brands', JSON.stringify(brands));
+    const res = await fetch(BRANDS_API_URL + '?action=getBrands');
+    if (!res.ok) throw new Error('Server error');
+    const data = await res.json();
+    if (!data.brands || data.brands.length === 0) return DEFAULT_BRANDS;
+    return data.brands.map(b => ({
+      id: brandNameToId(b.name),
+      name: b.name,
+      csvUrl: b.csvUrl
+    }));
   } catch (e) {
-    console.error('Could not save brands', e);
+    console.error('Could not load brands from server, using defaults', e);
+    return DEFAULT_BRANDS;
   }
 }
 
-let BRANDS = loadBrands();
+async function postBrandAction(payload) {
+  const res = await fetch(BRANDS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight on Apps Script
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Could not save changes to the server');
+  return res.json();
+}
+
+let BRANDS = DEFAULT_BRANDS; // populated by initBrands() before first render
 
 let currentBrand = BRANDS[0].id;
 let brandDataCache = {};
@@ -621,12 +634,19 @@ function renderTabs() {
       tab.ondblclick = (e) => {
         e.stopPropagation();
         const newName = prompt('Rename this brand:', b.name);
-        if (newName && newName.trim()) {
-          const brand = BRANDS.find(x => x.id === b.id);
-          brand.name = newName.trim();
-          saveBrands(BRANDS);
-          renderTabs();
-          renderContent();
+        if (newName && newName.trim() && newName.trim() !== b.name) {
+          const oldName = b.name;
+          const newNameTrimmed = newName.trim();
+          postBrandAction({ action: 'renameBrand', oldName, newName: newNameTrimmed })
+            .then(() => {
+              const brand = BRANDS.find(x => x.id === b.id);
+              brand.name = newNameTrimmed;
+              brand.id = brandNameToId(newNameTrimmed);
+              if (currentBrand === b.id) currentBrand = brand.id;
+              renderTabs();
+              renderContent();
+            })
+            .catch(() => alert('Could not rename. Check your connection and try again.'));
         }
       };
 
@@ -662,7 +682,7 @@ function closeAddBrandModal() {
   document.getElementById('addBrandModal').classList.remove('open');
 }
 
-function handleAddBrand() {
+async function handleAddBrand() {
   const name = document.getElementById('newBrandName').value.trim();
   const url = document.getElementById('newBrandUrl').value.trim();
   const errorEl = document.getElementById('addBrandError');
@@ -675,25 +695,42 @@ function handleAddBrand() {
     errorEl.textContent = 'Paste a valid Google Sheets published CSV link.';
     return;
   }
+  if (BRANDS.some(b => b.name.toLowerCase() === name.toLowerCase())) {
+    errorEl.textContent = 'A brand with this name already exists.';
+    return;
+  }
 
-  const id = 'brand_' + Date.now();
-  BRANDS.push({ id, name, csvUrl: url });
-  saveBrands(BRANDS);
-  currentBrand = id;
-  closeAddBrandModal();
-  renderTabs();
-  renderContent();
+  errorEl.textContent = 'Saving…';
+  errorEl.style.color = 'var(--slate)';
+  try {
+    await postBrandAction({ action: 'addBrand', name, csvUrl: url });
+    const id = brandNameToId(name);
+    BRANDS.push({ id, name, csvUrl: url });
+    currentBrand = id;
+    closeAddBrandModal();
+    renderTabs();
+    renderContent();
+  } catch (e) {
+    errorEl.textContent = 'Could not save. Check your connection and try again.';
+    errorEl.style.color = 'var(--red)';
+  }
 }
 
-function removeBrand(id) {
+async function removeBrand(id) {
   if (!confirm('Remove this brand from the dashboard?')) return;
-  BRANDS = BRANDS.filter(b => b.id !== id);
-  delete brandDataCache[id];
-  saveBrands(BRANDS);
-  if (BRANDS.length === 0) BRANDS = DEFAULT_BRANDS.slice();
-  currentBrand = BRANDS[0].id;
-  renderTabs();
-  renderContent();
+  const brand = BRANDS.find(b => b.id === id);
+  if (!brand) return;
+  try {
+    await postBrandAction({ action: 'removeBrand', name: brand.name });
+    BRANDS = BRANDS.filter(b => b.id !== id);
+    delete brandDataCache[id];
+    if (BRANDS.length === 0) BRANDS = DEFAULT_BRANDS.slice();
+    currentBrand = BRANDS[0].id;
+    renderTabs();
+    renderContent();
+  } catch (e) {
+    alert('Could not remove this brand. Check your connection and try again.');
+  }
 }
 
 function renderBreakdownLadder(rec) {
@@ -937,8 +974,15 @@ function renderContent() {
   }
 }
 
-renderTabs();
-renderContent();
+async function initBrands() {
+  content.innerHTML = '<div class="loading">Loading…</div>';
+  BRANDS = await fetchBrandsFromServer();
+  currentBrand = BRANDS[0].id;
+  renderTabs();
+  renderContent();
+}
+
+initBrands();
 </script>
 
 </body>
