@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PnL — Daily Profit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #FFFFFF;
+    --violet: #5B21B6;
+    --violet-deep: #4C1D95;
+    --lavender: #EDE9FE;
+    --lavender-soft: #F5F3FF;
+    --ink: #1C1917;
+    --slate: #6B7280;
+    --slate-light: #9CA3AF;
+    --green: #15803D;
+    --green-bg: #DCFCE7;
+    --red: #B91C1C;
+    --red-bg: #FEE2E2;
+    --border: #E5E1F5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--white);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 60px;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 18px 0;
+  }
+
+  .brand-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 24px;
+    scrollbar-width: none;
+  }
+  .brand-tabs::-webkit-scrollbar { display: none; }
+
+  .brand-tab {
+    flex-shrink: 0;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--slate);
+    background: var(--lavender-soft);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .brand-tab:hover { background: var(--lavender); }
+  .brand-tab.active {
+    background: var(--violet);
+    color: var(--white);
+  }
+
+  .hero-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .hero-date {
+    font-size: 13px;
+    color: var(--slate-light);
+    margin-bottom: 14px;
+  }
+
+  .hero-number {
+    font-family: 'Fraunces', serif;
+    font-size: 54px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .hero-number.profit { color: var(--green); }
+  .hero-number.loss { color: var(--red); }
+
+  .hero-margin {
+    font-size: 14px;
+    color: var(--slate);
+    margin-bottom: 28px;
+  }
+  .hero-margin .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+  .pill.profit { background: var(--green-bg); color: var(--green); }
+  .pill.loss { background: var(--red-bg); color: var(--red); }
+
+  .ladder {
+    background: var(--lavender-soft);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 18px;
+    margin-bottom: 28px;
+  }
+
+  .ladder-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--violet-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+
+  .ladder-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+  }
+  .ladder-row + .ladder-row {
+    border-top: 1px solid var(--border);
+  }
+
+  .ladder-label {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .ladder-label.sub { color: var(--slate); font-weight: 400; font-size: 13px; padding-left: 12px; }
+
+  .ladder-value {
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .ladder-value.neg { color: var(--red); }
+  .ladder-value.final {
+    font-size: 16px;
+  }
+  .ladder-value.final.profit { color: var(--green); }
+  .ladder-value.final.loss { color: var(--red); }
+
+  .ladder-bar-track {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+  .ladder-bar-fill {
+    height: 100%;
+    background: var(--violet);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+
+  .history-item {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+
+  .history-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .history-date .dow {
+    color: var(--slate-light);
+    font-weight: 400;
+    font-size: 12px;
+    margin-left: 6px;
+  }
+
+  .history-profit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .history-profit-value {
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .history-profit-value.profit { color: var(--green); }
+  .history-profit-value.loss { color: var(--red); }
+
+  .chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--slate-light);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  .history-item.expanded .chevron { transform: rotate(180deg); }
+
+  .history-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    background: var(--lavender-soft);
+  }
+  .history-item.expanded .history-detail {
+    max-height: 300px;
+  }
+  .history-detail-inner { padding: 4px 16px 16px; }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 6px 0;
+  }
+  .detail-row-label { color: var(--slate); }
+  .detail-row-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .detail-row-value.neg { color: var(--red); }
+
+  .range-picker {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .range-picker label {
+    flex: 1;
+  }
+  .range-picker-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .range-picker input[type="date"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--white);
+  }
+  .range-picker input[type="date"]:focus {
+    outline: 2px solid var(--violet);
+    outline-offset: 1px;
+  }
+
+  .loading, .empty-state {
+    text-align: center;
+    color: var(--slate);
+    font-size: 14px;
+    padding: 60px 20px;
+  }
+  .empty-state-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .error-state {
+    background: var(--red-bg);
+    color: var(--red);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="brand-tabs" id="brandTabs"></div>
+  <div id="content"></div>
+</div>
+
+<script>
+const BRANDS = [
+  {
+    id: 'store1',
+    name: 'New Store',
+    csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWHLWFW9GqjbnpQDkOSzbIrW8dKAurAXgypXAWzAu5BA1VFAZqn3eZwFUFWv5rhIk2M-iuKIfUZ0b-/pub?gid=420928309&single=true&output=csv'
+  }
+];
+
+let currentBrand = BRANDS[0].id;
+let brandDataCache = {};
+
+const content = document.getElementById('content');
+const brandTabsEl = document.getElementById('brandTabs');
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim().length > 0);
+  const rows = [];
+  for (const line of lines) {
+    const cells = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+    rows.push(cells);
+  }
+  return rows;
+}
+
+function findHeaderRowIndex(rows) {
+  return rows.findIndex(r => r[0] === 'Date' && r.some(c => c.includes('GrossRevenue')));
+}
+
+function parseNum(val) {
+  if (val === undefined || val === '' || val === null) return null;
+  const isPercent = val.includes('%');
+  const n = parseFloat(val.replace(/[^0-9.\-]/g, ''));
+  if (isNaN(n)) return null;
+  return isPercent ? n / 100 : n;
+}
+
+function isValidDate(str) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(str);
+}
+
+function rowsToRecords(rows) {
+  const headerIdx = findHeaderRowIndex(rows);
+  if (headerIdx === -1) return [];
+  const records = [];
+  for (let i = headerIdx + 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r[0] || !isValidDate(r[0])) continue;
+    const rec = {
+      date: r[0],
+      grossRevenue: parseNum(r[1]),
+      realFees: parseNum(r[2]),
+      netRevenueNative: parseNum(r[3]),
+      netRevenueUSD: parseNum(r[5]),
+      adSpendNative: parseNum(r[6]),
+      adSpendUSD: parseNum(r[8]),
+      cogsUSD: parseNum(r[9]),
+      netProfitUSD: parseNum(r[10]),
+      marginPct: parseNum(r[11]),
+    };
+    if (rec.netProfitUSD !== null) records.push(rec);
+  }
+  records.sort((a, b) => b.date.localeCompare(a.date));
+  return records;
+}
+
+async function fetchBrandData(brand) {
+  if (brandDataCache[brand.id]) return brandDataCache[brand.id];
+  const res = await fetch(brand.csvUrl);
+  if (!res.ok) throw new Error('Could not load data for ' + brand.name);
+  const text = await res.text();
+  const rows = parseCSV(text);
+  const records = rowsToRecords(rows);
+  brandDataCache[brand.id] = records;
+  return records;
+}
+
+function fmtUSD(n) {
+  if (n === null || n === undefined) return '—';
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtPct(n) {
+  if (n === null || n === undefined) return '—';
+  return (n * 100).toFixed(1) + '%';
+}
+
+function fmtDateLong(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function fmtDateShort(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function fmtDow(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'short' });
+}
+
+function statusClass(n) {
+  return n >= 0 ? 'profit' : 'loss';
+}
+
+function renderTabs() {
+  brandTabsEl.innerHTML = '';
+  const allTabs = [...BRANDS, { id: '__all__', name: 'All Brands' }];
+  allTabs.forEach(b => {
+    const tab = document.createElement('div');
+    tab.className = 'brand-tab' + (b.id === currentBrand ? ' active' : '');
+    tab.textContent = b.name;
+    tab.onclick = () => { currentBrand = b.id; renderTabs(); renderContent(); };
+    brandTabsEl.appendChild(tab);
+  });
+}
+
+function renderBreakdownLadder(rec) {
+  const maxVal = Math.max(rec.netRevenueUSD || 0, 1);
+  const bar = (val) => Math.min(100, Math.max(2, (Math.abs(val || 0) / maxVal) * 100));
+
+  return `
+    <div class="ladder">
+      <div class="ladder-title">Breakdown</div>
+
+      <div class="ladder-row">
+        <div class="ladder-label">Net Revenue</div>
+        <div class="ladder-value">${fmtUSD(rec.netRevenueUSD)}</div>
+      </div>
+      <div class="ladder-bar-track"><div class="ladder-bar-fill" style="width:${bar(rec.netRevenueUSD)}%"></div></div>
+
+      <div class="ladder-row">
+        <div class="ladder-label sub">− Ad spend</div>
+        <div class="ladder-value neg">${fmtUSD(rec.adSpendUSD)}</div>
+      </div>
+
+      <div class="ladder-row">
+        <div class="ladder-label sub">− COGS</div>
+        <div class="ladder-value neg">${fmtUSD(rec.cogsUSD)}</div>
+      </div>
+
+      <div class="ladder-row">
+        <div class="ladder-label" style="font-weight:700;">Net Profit</div>
+        <div class="ladder-value final ${statusClass(rec.netProfitUSD)}">${fmtUSD(rec.netProfitUSD)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderHistoryItem(rec, idx) {
+  return `
+    <div class="history-item" data-idx="${idx}">
+      <div class="history-row" onclick="toggleHistory(${idx})">
+        <div class="history-date">${fmtDateShort(rec.date)} <span class="dow">${fmtDow(rec.date)}</span></div>
+        <div class="history-profit">
+          <span class="history-profit-value ${statusClass(rec.netProfitUSD)}">${fmtUSD(rec.netProfitUSD)}</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="history-detail">
+        <div class="history-detail-inner">
+          <div class="detail-row"><span class="detail-row-label">Net Revenue</span><span class="detail-row-value">${fmtUSD(rec.netRevenueUSD)}</span></div>
+          <div class="detail-row"><span class="detail-row-label">Ad Spend</span><span class="detail-row-value neg">${fmtUSD(rec.adSpendUSD)}</span></div>
+          <div class="detail-row"><span class="detail-row-label">COGS</span><span class="detail-row-value neg">${fmtUSD(rec.cogsUSD)}</span></div>
+          <div class="detail-row"><span class="detail-row-label">Margin</span><span class="detail-row-value">${fmtPct(rec.marginPct)}</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+window.toggleHistory = function(idx) {
+  const item = document.querySelector('.history-item[data-idx="' + idx + '"]');
+  item.classList.toggle('expanded');
+};
+
+async function renderSingleBrand(brand) {
+  content.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const records = await fetchBrandData(brand);
+    if (records.length === 0) {
+      content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div>No complete days yet.<br>Check back once a full day of data has landed.</div>';
+      return;
+    }
+    const latest = records[0];
+    const history = records.slice(1, 30);
+
+    content.innerHTML = `
+      <div class="hero-label">${brand.name} — Net Profit</div>
+      <div class="hero-date">${fmtDateLong(latest.date)}</div>
+      <div class="hero-number ${statusClass(latest.netProfitUSD)}">${fmtUSD(latest.netProfitUSD)}</div>
+      <div class="hero-margin">
+        <span class="pill ${statusClass(latest.netProfitUSD)}">${latest.netProfitUSD >= 0 ? 'Profit' : 'Loss'}</span>
+        ${fmtPct(latest.marginPct)} margin
+      </div>
+
+      ${renderBreakdownLadder(latest)}
+
+      <div class="section-title">History</div>
+      ${history.map((r, i) => renderHistoryItem(r, i)).join('')}
+    `;
+  } catch (err) {
+    content.innerHTML = '<div class="error-state">Could not load this brand&#39;s data. ' + err.message + '</div>';
+  }
+}
+
+function defaultRangeDates() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const str = yesterday.toISOString().split('T')[0];
+  return { from: str, to: str };
+}
+
+async function renderAllBrands() {
+  const { from, to } = defaultRangeDates();
+  content.innerHTML = `
+    <div class="hero-label">All Brands — Net Profit</div>
+    <div class="range-picker">
+      <label>
+        <span class="range-picker-text">From</span>
+        <input type="date" id="rangeFrom" value="${from}">
+      </label>
+      <label>
+        <span class="range-picker-text">To</span>
+        <input type="date" id="rangeTo" value="${to}">
+      </label>
+    </div>
+    <div id="allBrandsResult"><div class="loading">Loading…</div></div>
+  `;
+
+  document.getElementById('rangeFrom').addEventListener('change', updateAllBrandsRange);
+  document.getElementById('rangeTo').addEventListener('change', updateAllBrandsRange);
+
+  await updateAllBrandsRange();
+}
+
+async function updateAllBrandsRange() {
+  const from = document.getElementById('rangeFrom').value;
+  const to = document.getElementById('rangeTo').value;
+  const resultEl = document.getElementById('allBrandsResult');
+  resultEl.innerHTML = '<div class="loading">Loading…</div>';
+
+  try {
+    const allRecords = await Promise.all(BRANDS.map(b => fetchBrandData(b)));
+    const totals = { netRevenueUSD: 0, adSpendUSD: 0, cogsUSD: 0, netProfitUSD: 0 };
+    let hasAny = false;
+
+    allRecords.forEach(records => {
+      records.forEach(rec => {
+        if (rec.date >= from && rec.date <= to) {
+          hasAny = true;
+          totals.netRevenueUSD += rec.netRevenueUSD || 0;
+          totals.adSpendUSD += rec.adSpendUSD || 0;
+          totals.cogsUSD += rec.cogsUSD || 0;
+          totals.netProfitUSD += rec.netProfitUSD || 0;
+        }
+      });
+    });
+
+    if (!hasAny) {
+      resultEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div>No data in this date range yet.</div>';
+      return;
+    }
+
+    const margin = totals.netRevenueUSD ? totals.netProfitUSD / totals.netRevenueUSD : null;
+
+    resultEl.innerHTML = `
+      <div class="hero-number ${statusClass(totals.netProfitUSD)}" style="margin-top:18px;">${fmtUSD(totals.netProfitUSD)}</div>
+      <div class="hero-margin">
+        <span class="pill ${statusClass(totals.netProfitUSD)}">${totals.netProfitUSD >= 0 ? 'Profit' : 'Loss'}</span>
+        ${fmtPct(margin)} margin · ${BRANDS.length} brand${BRANDS.length > 1 ? 's' : ''}
+      </div>
+
+      <div class="ladder">
+        <div class="ladder-title">Combined Breakdown</div>
+        <div class="ladder-row">
+          <div class="ladder-label">Net Revenue</div>
+          <div class="ladder-value">${fmtUSD(totals.netRevenueUSD)}</div>
+        </div>
+        <div class="ladder-row">
+          <div class="ladder-label sub">− Ad spend</div>
+          <div class="ladder-value neg">${fmtUSD(totals.adSpendUSD)}</div>
+        </div>
+        <div class="ladder-row">
+          <div class="ladder-label sub">− COGS</div>
+          <div class="ladder-value neg">${fmtUSD(totals.cogsUSD)}</div>
+        </div>
+        <div class="ladder-row">
+          <div class="ladder-label" style="font-weight:700;">Net Profit</div>
+          <div class="ladder-value final ${statusClass(totals.netProfitUSD)}">${fmtUSD(totals.netProfitUSD)}</div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    resultEl.innerHTML = '<div class="error-state">Could not load combined data. ' + err.message + '</div>';
+  }
+}
+
+function renderContent() {
+  if (currentBrand === '__all__') {
+    renderAllBrands();
+  } else {
+    const brand = BRANDS.find(b => b.id === currentBrand);
+    renderSingleBrand(brand);
+  }
+}
+
+renderTabs();
+renderContent();
+</script>
+
+</body>
+</html>
