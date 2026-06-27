@@ -68,6 +68,120 @@
     color: var(--white);
   }
 
+  .brand-tab.add-tab {
+    background: var(--white);
+    color: var(--violet);
+    border: 1.5px dashed var(--violet);
+  }
+  .brand-tab.add-tab:hover {
+    background: var(--lavender-soft);
+  }
+
+  .tab-remove {
+    margin-left: 7px;
+    opacity: 0.5;
+    font-size: 15px;
+    line-height: 1;
+  }
+  .tab-remove:hover {
+    opacity: 1;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 25, 23, 0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+
+  .modal-card {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 24px 22px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(76, 29, 149, 0.25);
+  }
+
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+
+  .modal-label {
+    display: block;
+    margin-bottom: 14px;
+  }
+  .modal-label span {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .modal-label input {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .modal-label input:focus {
+    outline: 2px solid var(--violet);
+    outline-offset: 1px;
+  }
+
+  .modal-error {
+    color: var(--red);
+    font-size: 13px;
+    min-height: 18px;
+    margin-bottom: 6px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .modal-btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+  }
+  .modal-btn.secondary {
+    background: var(--lavender-soft);
+    color: var(--slate);
+  }
+  .modal-btn.secondary:hover {
+    background: var(--lavender);
+  }
+  .modal-btn.primary {
+    background: var(--violet);
+    color: var(--white);
+  }
+  .modal-btn.primary:hover {
+    background: var(--violet-deep);
+  }
+
   .hero-label {
     font-size: 13px;
     font-weight: 600;
@@ -316,14 +430,56 @@
   <div id="content"></div>
 </div>
 
+<div class="modal-overlay" id="addBrandModal">
+  <div class="modal-card">
+    <div class="modal-title">Add a brand</div>
+    <label class="modal-label">
+      <span>Brand name</span>
+      <input type="text" id="newBrandName" placeholder="e.g. Soléa">
+    </label>
+    <label class="modal-label">
+      <span>Published CSV link</span>
+      <input type="text" id="newBrandUrl" placeholder="https://docs.google.com/spreadsheets/...">
+    </label>
+    <div class="modal-error" id="addBrandError"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeAddBrandModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="handleAddBrand()">Add brand</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const BRANDS = [
+const DEFAULT_BRANDS = [
   {
     id: 'store1',
     name: 'New Store',
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWHLWFW9GqjbnpQDkOSzbIrW8dKAurAXgypXAWzAu5BA1VFAZqn3eZwFUFWv5rhIk2M-iuKIfUZ0b-/pub?gid=420928309&single=true&output=csv'
   }
 ];
+
+function loadBrands() {
+  try {
+    const saved = localStorage.getItem('pnl_brands');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    console.error('Could not load saved brands', e);
+  }
+  return DEFAULT_BRANDS;
+}
+
+function saveBrands(brands) {
+  try {
+    localStorage.setItem('pnl_brands', JSON.stringify(brands));
+  } catch (e) {
+    console.error('Could not save brands', e);
+  }
+}
+
+let BRANDS = loadBrands();
 
 let currentBrand = BRANDS[0].id;
 let brandDataCache = {};
@@ -429,10 +585,91 @@ function renderTabs() {
   allTabs.forEach(b => {
     const tab = document.createElement('div');
     tab.className = 'brand-tab' + (b.id === currentBrand ? ' active' : '');
-    tab.textContent = b.name;
     tab.onclick = () => { currentBrand = b.id; renderTabs(); renderContent(); };
+
+    if (b.id === '__all__') {
+      tab.textContent = b.name;
+    } else {
+      const label = document.createElement('span');
+      label.textContent = b.name;
+      tab.appendChild(label);
+
+      tab.ondblclick = (e) => {
+        e.stopPropagation();
+        const newName = prompt('Rename this brand:', b.name);
+        if (newName && newName.trim()) {
+          const brand = BRANDS.find(x => x.id === b.id);
+          brand.name = newName.trim();
+          saveBrands(BRANDS);
+          renderTabs();
+          renderContent();
+        }
+      };
+
+      const removeBtn = document.createElement('span');
+      removeBtn.className = 'tab-remove';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        removeBrand(b.id);
+      };
+      tab.appendChild(removeBtn);
+    }
+
     brandTabsEl.appendChild(tab);
   });
+
+  const addTab = document.createElement('div');
+  addTab.className = 'brand-tab add-tab';
+  addTab.textContent = '+ Add brand';
+  addTab.onclick = openAddBrandModal;
+  brandTabsEl.appendChild(addTab);
+}
+
+function openAddBrandModal() {
+  document.getElementById('addBrandModal').classList.add('open');
+  document.getElementById('newBrandName').value = '';
+  document.getElementById('newBrandUrl').value = '';
+  document.getElementById('addBrandError').textContent = '';
+  setTimeout(() => document.getElementById('newBrandName').focus(), 50);
+}
+
+function closeAddBrandModal() {
+  document.getElementById('addBrandModal').classList.remove('open');
+}
+
+function handleAddBrand() {
+  const name = document.getElementById('newBrandName').value.trim();
+  const url = document.getElementById('newBrandUrl').value.trim();
+  const errorEl = document.getElementById('addBrandError');
+
+  if (!name) {
+    errorEl.textContent = 'Enter a name for this brand.';
+    return;
+  }
+  if (!url || !url.startsWith('https://docs.google.com/')) {
+    errorEl.textContent = 'Paste a valid Google Sheets published CSV link.';
+    return;
+  }
+
+  const id = 'brand_' + Date.now();
+  BRANDS.push({ id, name, csvUrl: url });
+  saveBrands(BRANDS);
+  currentBrand = id;
+  closeAddBrandModal();
+  renderTabs();
+  renderContent();
+}
+
+function removeBrand(id) {
+  if (!confirm('Remove this brand from the dashboard?')) return;
+  BRANDS = BRANDS.filter(b => b.id !== id);
+  delete brandDataCache[id];
+  saveBrands(BRANDS);
+  if (BRANDS.length === 0) BRANDS = DEFAULT_BRANDS.slice();
+  currentBrand = BRANDS[0].id;
+  renderTabs();
+  renderContent();
 }
 
 function renderBreakdownLadder(rec) {
