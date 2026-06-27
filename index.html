@@ -513,25 +513,49 @@ function isValidDate(str) {
   return /^\d{4}-\d{2}-\d{2}$/.test(str);
 }
 
+// Maps a header cell's text to a canonical field name.
+// Handles different template versions (v5 had no FX-locked columns, v6 added them, etc)
+function mapHeaderToField(headerText) {
+  const h = headerText.trim();
+  if (h === 'Date') return 'date';
+  if (h.includes('GrossRevenue')) return 'grossRevenue';
+  if (h.includes('RealFees')) return 'realFees';
+  if (h.startsWith('NetRevenue') && h.includes('Native')) return 'netRevenueNative';
+  if (h.startsWith('NetRevenue') && h.includes('USD')) return 'netRevenueUSD';
+  if (h.startsWith('AdSpend') && h.includes('Native')) return 'adSpendNative';
+  if (h.startsWith('AdSpend') && h.includes('USD')) return 'adSpendUSD';
+  if (h.includes('COGS')) return 'cogsUSD';
+  if (h.includes('NetProfit')) return 'netProfitUSD';
+  if (h.includes('Margin')) return 'marginPct';
+  if (h.includes('Status')) return 'status';
+  return null; // unrecognized column (e.g. RevFXRate_Locked, AdFXRate_Locked) — ignored
+}
+
 function rowsToRecords(rows) {
   const headerIdx = findHeaderRowIndex(rows);
   if (headerIdx === -1) return [];
+
+  const headerRow = rows[headerIdx];
+  const fieldByColumn = headerRow.map(mapHeaderToField);
+
   const records = [];
   for (let i = headerIdx + 1; i < rows.length; i++) {
     const r = rows[i];
     if (!r[0] || !isValidDate(r[0])) continue;
+
     const rec = {
-      date: r[0],
-      grossRevenue: parseNum(r[1]),
-      realFees: parseNum(r[2]),
-      netRevenueNative: parseNum(r[3]),
-      netRevenueUSD: parseNum(r[5]),
-      adSpendNative: parseNum(r[6]),
-      adSpendUSD: parseNum(r[8]),
-      cogsUSD: parseNum(r[9]),
-      netProfitUSD: parseNum(r[10]),
-      marginPct: parseNum(r[11]),
+      date: null, grossRevenue: null, realFees: null,
+      netRevenueNative: null, netRevenueUSD: null,
+      adSpendNative: null, adSpendUSD: null,
+      cogsUSD: null, netProfitUSD: null, marginPct: null
     };
+
+    fieldByColumn.forEach((field, colIdx) => {
+      if (!field || field === 'status') return;
+      const rawVal = r[colIdx];
+      rec[field] = field === 'date' ? rawVal : parseNum(rawVal);
+    });
+
     if (rec.netProfitUSD !== null) records.push(rec);
   }
   records.sort((a, b) => b.date.localeCompare(a.date));
@@ -743,6 +767,7 @@ async function renderSingleBrand(brand) {
     }
     const latest = records[0];
     const history = records.slice(1, 30);
+    const { from, to } = defaultRangeDates();
 
     content.innerHTML = `
       <div class="hero-label">${brand.name} — Net Profit</div>
@@ -755,9 +780,57 @@ async function renderSingleBrand(brand) {
 
       ${renderBreakdownLadder(latest)}
 
+      <div class="section-title">Custom range</div>
+      <div class="range-picker">
+        <label>
+          <span class="range-picker-text">From</span>
+          <input type="date" id="brandRangeFrom" value="${from}">
+        </label>
+        <label>
+          <span class="range-picker-text">To</span>
+          <input type="date" id="brandRangeTo" value="${to}">
+        </label>
+      </div>
+      <div id="brandRangeResult"></div>
+
       <div class="section-title">History</div>
       ${history.map((r, i) => renderHistoryItem(r, i)).join('')}
     `;
+
+    const updateBrandRange = () => {
+      const f = document.getElementById('brandRangeFrom').value;
+      const t = document.getElementById('brandRangeTo').value;
+      const resultEl = document.getElementById('brandRangeResult');
+      const totals = { netRevenueUSD: 0, adSpendUSD: 0, cogsUSD: 0, netProfitUSD: 0 };
+      let hasAny = false;
+      records.forEach(rec => {
+        if (rec.date >= f && rec.date <= t) {
+          hasAny = true;
+          totals.netRevenueUSD += rec.netRevenueUSD || 0;
+          totals.adSpendUSD += rec.adSpendUSD || 0;
+          totals.cogsUSD += rec.cogsUSD || 0;
+          totals.netProfitUSD += rec.netProfitUSD || 0;
+        }
+      });
+      if (!hasAny) {
+        resultEl.innerHTML = '<div class="empty-state" style="padding:30px 10px;"><div class="empty-state-icon">📅</div>No data in this range.</div>';
+        return;
+      }
+      resultEl.innerHTML = `
+        <div class="ladder">
+          <div class="ladder-title">Range total (USD)</div>
+          <div class="ladder-row"><div class="ladder-label">Net Revenue</div><div class="ladder-value">${fmtUSD(totals.netRevenueUSD)}</div></div>
+          <div class="ladder-row"><div class="ladder-label sub">− Ad spend</div><div class="ladder-value neg">${fmtUSD(totals.adSpendUSD)}</div></div>
+          <div class="ladder-row"><div class="ladder-label sub">− COGS</div><div class="ladder-value neg">${fmtUSD(totals.cogsUSD)}</div></div>
+          <div class="ladder-row"><div class="ladder-label" style="font-weight:700;">Net Profit</div><div class="ladder-value final ${statusClass(totals.netProfitUSD)}">${fmtUSD(totals.netProfitUSD)}</div></div>
+        </div>
+      `;
+    };
+
+    document.getElementById('brandRangeFrom').addEventListener('change', updateBrandRange);
+    document.getElementById('brandRangeTo').addEventListener('change', updateBrandRange);
+    updateBrandRange();
+
   } catch (err) {
     content.innerHTML = '<div class="error-state">Could not load this brand&#39;s data. ' + err.message + '</div>';
   }
