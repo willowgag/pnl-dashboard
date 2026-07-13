@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PnL</title>
+<title>PnL — Daily Profit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -891,8 +891,12 @@ function buildRecordsByDate(records) {
   return map;
 }
 
-function renderCalendarMonth(recordsByDate, year, month) {
+function renderCalendarMonth(recordsByDate, year, month, isAllBrands) {
   // month is 0-indexed (0 = January)
+  const selectFn = isAllBrands ? 'selectAllBrandsCalendarDay' : 'selectCalendarDay';
+  const navFn = isAllBrands ? 'changeAllBrandsCalendarMonth' : 'changeCalendarMonth';
+  const detailId = isAllBrands ? 'allBrandsCalDayDetail' : 'calDayDetail';
+
   const firstOfMonth = new Date(year, month, 1);
   const startWeekday = firstOfMonth.getDay(); // 0 = Sunday
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -914,7 +918,7 @@ function renderCalendarMonth(recordsByDate, year, month) {
       const cls = statusClass(rec.netProfitUSD);
       const compactVal = fmtUSDCompact(rec.netProfitUSD);
       dayCells.push(`
-        <div class="cal-cell cal-cell-${cls}" data-date="${dateStr}" onclick="selectCalendarDay('${dateStr}')">
+        <div class="cal-cell cal-cell-${cls}" data-date="${dateStr}" onclick="${selectFn}('${dateStr}')">
           <div class="cal-cell-day">${d}</div>
           <div class="cal-cell-val">${compactVal}</div>
         </div>
@@ -932,18 +936,18 @@ function renderCalendarMonth(recordsByDate, year, month) {
 
   return `
     <div class="cal-header">
-      <button class="cal-nav" onclick="changeCalendarMonth(-1)" aria-label="Previous month">‹</button>
+      <button class="cal-nav" onclick="${navFn}(-1)" aria-label="Previous month">‹</button>
       <div class="cal-month-info">
         <div class="cal-month-label">${monthLabel}</div>
         <div class="cal-month-total ${monthTotal >= 0 ? 'profit' : 'loss'}">${fmtUSD(monthTotal)} <span class="cal-month-days">· ${daysWithData} day${daysWithData !== 1 ? 's' : ''}</span></div>
       </div>
-      <button class="cal-nav" onclick="changeCalendarMonth(1)" aria-label="Next month">›</button>
+      <button class="cal-nav" onclick="${navFn}(1)" aria-label="Next month">›</button>
     </div>
     <div class="cal-grid">
       ${dowLabels.map(l => `<div class="cal-dow">${l}</div>`).join('')}
       ${dayCells.join('')}
     </div>
-    <div id="calDayDetail"></div>
+    <div id="${detailId}"></div>
   `;
 }
 
@@ -1094,12 +1098,94 @@ async function renderAllBrands() {
       </label>
     </div>
     <div id="allBrandsResult"><div class="loading">Loading…</div></div>
+
+    <div class="section-title">P&amp;L Calendar (combined)</div>
+    <div id="allBrandsCalContainer"><div class="loading">Loading…</div></div>
   `;
 
   document.getElementById('rangeFrom').addEventListener('change', updateAllBrandsRange);
   document.getElementById('rangeTo').addEventListener('change', updateAllBrandsRange);
 
   await updateAllBrandsRange();
+  await renderAllBrandsCalendar();
+}
+
+function buildCombinedRecordsByDate(allRecordsArrays) {
+  const combined = {};
+  allRecordsArrays.forEach(records => {
+    records.forEach(rec => {
+      if (!combined[rec.date]) {
+        combined[rec.date] = { date: rec.date, netRevenueUSD: 0, adSpendUSD: 0, cogsUSD: 0, netProfitUSD: 0 };
+      }
+      combined[rec.date].netRevenueUSD += rec.netRevenueUSD || 0;
+      combined[rec.date].adSpendUSD += rec.adSpendUSD || 0;
+      combined[rec.date].cogsUSD += rec.cogsUSD || 0;
+      combined[rec.date].netProfitUSD += rec.netProfitUSD || 0;
+    });
+  });
+  Object.values(combined).forEach(rec => {
+    rec.marginPct = rec.netRevenueUSD ? rec.netProfitUSD / rec.netRevenueUSD : null;
+  });
+  return combined;
+}
+
+let allBrandsCalState = { year: null, month: null, recordsByDate: null, selectedDate: null };
+
+window.changeAllBrandsCalendarMonth = function(delta) {
+  allBrandsCalState.month += delta;
+  if (allBrandsCalState.month > 11) { allBrandsCalState.month = 0; allBrandsCalState.year++; }
+  if (allBrandsCalState.month < 0) { allBrandsCalState.month = 11; allBrandsCalState.year--; }
+  allBrandsCalState.selectedDate = null;
+  document.getElementById('allBrandsCalContainer').innerHTML = renderCalendarMonth(
+    allBrandsCalState.recordsByDate, allBrandsCalState.year, allBrandsCalState.month, true
+  );
+};
+
+window.selectAllBrandsCalendarDay = function(dateStr) {
+  const rec = allBrandsCalState.recordsByDate[dateStr];
+  const detailEl = document.getElementById('allBrandsCalDayDetail');
+  if (!rec) { detailEl.innerHTML = ''; return; }
+  if (allBrandsCalState.selectedDate === dateStr) {
+    allBrandsCalState.selectedDate = null;
+    detailEl.innerHTML = '';
+    return;
+  }
+  allBrandsCalState.selectedDate = dateStr;
+  detailEl.innerHTML = `
+    <div class="cal-detail-card">
+      <div class="cal-detail-date">${fmtDateLong(rec.date)} · all brands</div>
+      <div class="detail-row"><span class="detail-row-label">Net Revenue</span><span class="detail-row-value">${fmtUSD(rec.netRevenueUSD)}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Ad Spend</span><span class="detail-row-value neg">${fmtUSD(rec.adSpendUSD)}</span></div>
+      <div class="detail-row"><span class="detail-row-label">COGS</span><span class="detail-row-value neg">${fmtUSD(rec.cogsUSD)}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Margin</span><span class="detail-row-value">${fmtPct(rec.marginPct)}</span></div>
+      <div class="detail-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:10px;">
+        <span class="detail-row-label" style="font-weight:700;color:var(--ink);">Net Profit</span>
+        <span class="detail-row-value ${statusClass(rec.netProfitUSD)}" style="font-weight:700;">${fmtUSD(rec.netProfitUSD)}</span>
+      </div>
+    </div>
+  `;
+};
+
+async function renderAllBrandsCalendar() {
+  const containerEl = document.getElementById('allBrandsCalContainer');
+  try {
+    const allRecordsArrays = await Promise.all(BRANDS.map(b => fetchBrandData(b)));
+    const recordsByDate = buildCombinedRecordsByDate(allRecordsArrays);
+    const dates = Object.keys(recordsByDate).sort();
+
+    if (dates.length === 0) {
+      containerEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div>No complete days yet.</div>';
+      return;
+    }
+
+    const latestDate = dates[dates.length - 1];
+    const parts = latestDate.split('-').map(Number);
+    allBrandsCalState = { year: parts[0], month: parts[1] - 1, recordsByDate, selectedDate: null };
+
+    containerEl.innerHTML = renderCalendarMonth(recordsByDate, allBrandsCalState.year, allBrandsCalState.month, true);
+  } catch (err) {
+    containerEl.innerHTML = '<div class="error-state">Could not load combined calendar. ' + err.message + '</div>';
+  }
 }
 
 async function updateAllBrandsRange() {
