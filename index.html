@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PnL — Daily Profit</title>
+<title>PnL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -403,6 +403,121 @@
     outline-offset: 1px;
   }
 
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .cal-nav {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--lavender-soft);
+    color: var(--violet-deep);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .cal-nav:hover {
+    background: var(--lavender);
+  }
+  .cal-month-info {
+    text-align: center;
+  }
+  .cal-month-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .cal-month-total {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .cal-month-total.profit { color: var(--green); }
+  .cal-month-total.loss { color: var(--red); }
+  .cal-month-days {
+    color: var(--slate);
+    font-weight: 400;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 4px;
+  }
+  .cal-dow {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--slate-light);
+    text-transform: uppercase;
+    padding-bottom: 4px;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .cal-cell-empty {
+    background: transparent;
+  }
+  .cal-cell-nodata {
+    background: var(--lavender-soft);
+    border: 1px solid var(--border);
+  }
+  .cal-cell-nodata .cal-cell-day {
+    color: var(--slate-light);
+  }
+  .cal-cell-profit {
+    background: var(--green-bg);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    cursor: pointer;
+  }
+  .cal-cell-loss {
+    background: var(--red-bg);
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    cursor: pointer;
+  }
+  .cal-cell-profit:active, .cal-cell-loss:active {
+    transform: scale(0.95);
+  }
+  .cal-cell-day {
+    font-size: 11px;
+    color: var(--slate);
+  }
+  .cal-cell-profit .cal-cell-day { color: var(--green); }
+  .cal-cell-loss .cal-cell-day { color: var(--red); }
+  .cal-cell-val {
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .cal-cell-profit .cal-cell-val { color: var(--green); }
+  .cal-cell-loss .cal-cell-val { color: var(--red); }
+
+  .cal-detail-card {
+    background: var(--lavender-soft);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 14px;
+  }
+  .cal-detail-date {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
   .loading, .empty-state {
     text-align: center;
     color: var(--slate);
@@ -770,33 +885,109 @@ function renderBreakdownLadder(rec) {
   `;
 }
 
-function renderHistoryItem(rec, idx) {
+function buildRecordsByDate(records) {
+  const map = {};
+  records.forEach(r => { map[r.date] = r; });
+  return map;
+}
+
+function renderCalendarMonth(recordsByDate, year, month) {
+  // month is 0-indexed (0 = January)
+  const firstOfMonth = new Date(year, month, 1);
+  const startWeekday = firstOfMonth.getDay(); // 0 = Sunday
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthLabel = firstOfMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  let monthTotal = 0;
+  let daysWithData = 0;
+
+  const dayCells = [];
+  for (let i = 0; i < startWeekday; i++) {
+    dayCells.push('<div class="cal-cell cal-cell-empty"></div>');
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const rec = recordsByDate[dateStr];
+    if (rec) {
+      monthTotal += rec.netProfitUSD || 0;
+      daysWithData++;
+      const cls = statusClass(rec.netProfitUSD);
+      const compactVal = fmtUSDCompact(rec.netProfitUSD);
+      dayCells.push(`
+        <div class="cal-cell cal-cell-${cls}" data-date="${dateStr}" onclick="selectCalendarDay('${dateStr}')">
+          <div class="cal-cell-day">${d}</div>
+          <div class="cal-cell-val">${compactVal}</div>
+        </div>
+      `);
+    } else {
+      dayCells.push(`
+        <div class="cal-cell cal-cell-nodata">
+          <div class="cal-cell-day">${d}</div>
+        </div>
+      `);
+    }
+  }
+
+  const dowLabels = ['S','M','T','W','T','F','S'];
+
   return `
-    <div class="history-item" data-idx="${idx}">
-      <div class="history-row" onclick="toggleHistory(${idx})">
-        <div class="history-date">${fmtDateShort(rec.date)} <span class="dow">${fmtDow(rec.date)}</span></div>
-        <div class="history-profit">
-          <span class="history-profit-value ${statusClass(rec.netProfitUSD)}">${fmtUSD(rec.netProfitUSD)}</span>
-          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changeCalendarMonth(-1)" aria-label="Previous month">‹</button>
+      <div class="cal-month-info">
+        <div class="cal-month-label">${monthLabel}</div>
+        <div class="cal-month-total ${monthTotal >= 0 ? 'profit' : 'loss'}">${fmtUSD(monthTotal)} <span class="cal-month-days">· ${daysWithData} day${daysWithData !== 1 ? 's' : ''}</span></div>
       </div>
-      <div class="history-detail">
-        <div class="history-detail-inner">
-          <div class="detail-row"><span class="detail-row-label">Net Revenue</span><span class="detail-row-value">${fmtUSD(rec.netRevenueUSD)}</span></div>
-          <div class="detail-row"><span class="detail-row-label">Ad Spend</span><span class="detail-row-value neg">${fmtUSD(rec.adSpendUSD)}</span></div>
-          <div class="detail-row"><span class="detail-row-label">COGS</span><span class="detail-row-value neg">${fmtUSD(rec.cogsUSD)}</span></div>
-          <div class="detail-row"><span class="detail-row-label">Margin</span><span class="detail-row-value">${fmtPct(rec.marginPct)}</span></div>
-        </div>
-      </div>
+      <button class="cal-nav" onclick="changeCalendarMonth(1)" aria-label="Next month">›</button>
     </div>
+    <div class="cal-grid">
+      ${dowLabels.map(l => `<div class="cal-dow">${l}</div>`).join('')}
+      ${dayCells.join('')}
+    </div>
+    <div id="calDayDetail"></div>
   `;
 }
 
-window.toggleHistory = function(idx) {
-  const item = document.querySelector('.history-item[data-idx="' + idx + '"]');
-  item.classList.toggle('expanded');
+function fmtUSDCompact(n) {
+  if (n === null || n === undefined) return '—';
+  const sign = n < 0 ? '-' : '';
+  const abs = Math.abs(n);
+  if (abs >= 1000) return sign + '$' + (abs / 1000).toFixed(1) + 'k';
+  return sign + '$' + Math.round(abs);
+}
+
+let calState = { year: null, month: null, recordsByDate: null, selectedDate: null };
+
+window.changeCalendarMonth = function(delta) {
+  calState.month += delta;
+  if (calState.month > 11) { calState.month = 0; calState.year++; }
+  if (calState.month < 0) { calState.month = 11; calState.year--; }
+  calState.selectedDate = null;
+  document.getElementById('calContainer').innerHTML = renderCalendarMonth(calState.recordsByDate, calState.year, calState.month);
+};
+
+window.selectCalendarDay = function(dateStr) {
+  const rec = calState.recordsByDate[dateStr];
+  const detailEl = document.getElementById('calDayDetail');
+  if (!rec) { detailEl.innerHTML = ''; return; }
+  if (calState.selectedDate === dateStr) {
+    calState.selectedDate = null;
+    detailEl.innerHTML = '';
+    return;
+  }
+  calState.selectedDate = dateStr;
+  detailEl.innerHTML = `
+    <div class="cal-detail-card">
+      <div class="cal-detail-date">${fmtDateLong(rec.date)}</div>
+      <div class="detail-row"><span class="detail-row-label">Net Revenue</span><span class="detail-row-value">${fmtUSD(rec.netRevenueUSD)}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Ad Spend</span><span class="detail-row-value neg">${fmtUSD(rec.adSpendUSD)}</span></div>
+      <div class="detail-row"><span class="detail-row-label">COGS</span><span class="detail-row-value neg">${fmtUSD(rec.cogsUSD)}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Margin</span><span class="detail-row-value">${fmtPct(rec.marginPct)}</span></div>
+      <div class="detail-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:10px;">
+        <span class="detail-row-label" style="font-weight:700;color:var(--ink);">Net Profit</span>
+        <span class="detail-row-value ${statusClass(rec.netProfitUSD)}" style="font-weight:700;">${fmtUSD(rec.netProfitUSD)}</span>
+      </div>
+    </div>
+  `;
 };
 
 async function renderSingleBrand(brand) {
@@ -808,8 +999,11 @@ async function renderSingleBrand(brand) {
       return;
     }
     const latest = records[0];
-    const history = records.slice(1, 30);
     const { from, to } = defaultRangeDates();
+
+    const recordsByDate = buildRecordsByDate(records);
+    const latestDateParts = latest.date.split('-').map(Number);
+    calState = { year: latestDateParts[0], month: latestDateParts[1] - 1, recordsByDate, selectedDate: null };
 
     content.innerHTML = `
       <div class="hero-label">${brand.name} — Net Profit</div>
@@ -835,8 +1029,8 @@ async function renderSingleBrand(brand) {
       </div>
       <div id="brandRangeResult"></div>
 
-      <div class="section-title">History</div>
-      ${history.map((r, i) => renderHistoryItem(r, i)).join('')}
+      <div class="section-title">P&amp;L Calendar</div>
+      <div id="calContainer">${renderCalendarMonth(recordsByDate, calState.year, calState.month)}</div>
     `;
 
     const updateBrandRange = () => {
