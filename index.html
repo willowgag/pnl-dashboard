@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PnL — Daily Profit</title>
+<title>P/L</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -636,10 +636,14 @@ function findHeaderRowIndex(rows) {
 
 function parseNum(val) {
   if (val === undefined || val === '' || val === null) return null;
-  const isPercent = val.includes('%');
-  const n = parseFloat(val.replace(/[^0-9.\-]/g, ''));
+  const str = val.trim();
+  const isPercent = str.includes('%');
+  // Handle parentheses as negative: ($131.00) -> -131.00
+  const isNegative = str.startsWith('(') && str.endsWith(')');
+  const n = parseFloat(str.replace(/[^0-9.\-]/g, ''));
   if (isNaN(n)) return null;
-  return isPercent ? n / 100 : n;
+  const result = isNegative ? -Math.abs(n) : n;
+  return isPercent ? result / 100 : result;
 }
 
 function isValidDate(str) {
