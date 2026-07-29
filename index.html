@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PnL</title>
+<title>PnL — Daily Profit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -643,7 +643,27 @@ function parseNum(val) {
 }
 
 function isValidDate(str) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(str);
+  if (!str) return false;
+  // Accept YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return true;
+  // Accept M/D/YYYY or MM/DD/YYYY format (Google Sheets locale-dependent export)
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) return true;
+  return false;
+}
+
+function normalizeDate(str) {
+  if (!str) return str;
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  // Convert M/D/YYYY to YYYY-MM-DD
+  const parts = str.split('/');
+  if (parts.length === 3) {
+    const month = parts[0].padStart(2, '0');
+    const day = parts[1].padStart(2, '0');
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+  }
+  return str;
 }
 
 // Maps a header cell's text to a canonical field name.
@@ -686,7 +706,7 @@ function rowsToRecords(rows) {
     fieldByColumn.forEach((field, colIdx) => {
       if (!field || field === 'status') return;
       const rawVal = r[colIdx];
-      rec[field] = field === 'date' ? rawVal : parseNum(rawVal);
+      rec[field] = field === 'date' ? normalizeDate(rawVal) : parseNum(rawVal);
     });
 
     if (rec.netProfitUSD !== null) records.push(rec);
