@@ -624,7 +624,26 @@ function parseCSV(text) {
   const lines = text.trim().split('\n').filter(l => l.trim().length > 0);
   const rows = [];
   for (const line of lines) {
-    const cells = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+    const cells = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (ch === ',' && !inQuotes) {
+        cells.push(current.trim());
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+    cells.push(current.trim());
     rows.push(cells);
   }
   return rows;
